@@ -52,14 +52,23 @@ void loop(){
 
   WiFiClient client = server.available();
 
+  if (!client) {
+    return;
+  }
+
+  // Attente donnees envoyees par un client
+  Serial.println("Nouveau client");
+  while(!client.available()){
+    delay(1);
+  }
+
+  // Lecture premiere ligne de la requete
   String req = client.readStringUntil('\r');
   Serial.println(req);
   client.flush();
 
   if(!client.available()){
-    // Ici on check le système pour verifier l'hulidité du sol
       
-
         if(req.indexOf("/check/1") != -1){   // Si l'utilisateur appui sur le button check system
             defaut();     // detecter l'état du sol 
             traitement();
