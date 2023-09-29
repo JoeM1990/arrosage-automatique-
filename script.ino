@@ -24,11 +24,13 @@ void setup()
   pinMode(signal_sensor, OUTPUT);
   pinMode(led_verte, OUTPUT);
   pinMode(led_rouge, OUTPUT);
-  pinMode(miseEnMarche, OUTPUT);
+  pinMode(relay, OUTPUT);
+  //pinMode(miseEnMarche, OUTPUT);
 
   digitalWrite(led_verte, LOW);
   digitalWrite(led_rouge, LOW);
   digitalWrite(signal_sensor, LOW);
+  digitalWrite(relay, LOW);
   //digitalWrite(miseEnMarche, HIGH);
 
   while (WiFi.status() != WL_CONNECTED) {
@@ -78,12 +80,14 @@ void loop(){
 
         else if (req.indexOf("/start/1") != -1){   // Boutton  manuel_ON
             digitalWrite(signal_sensor, HIGH);
+            digitalWrite(relay, HIGH);
 
             Serial.println("Arrosage demarrer");          
           }
 
         else if(req.indexOf("/start/0") != -1){ // Bouton manuel_OFF
             digitalWrite(signal_sensor, LOW); 
+            digitalWrite(relay, LOW);
             
             Serial.println("Arrosage fermer");
         }
