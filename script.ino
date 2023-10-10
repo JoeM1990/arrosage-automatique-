@@ -79,10 +79,18 @@ void loop(){
           }
 
         else if (req.indexOf("/start/1") != -1){   // Boutton  manuel_ON
-            digitalWrite(signal_sensor, HIGH);
-            digitalWrite(relay, HIGH);
 
-            Serial.println("Arrosage demarrer");          
+            defaut();
+
+            if(pourcentage<20){
+              digitalWrite(signal_sensor, HIGH);
+              digitalWrite(relay, HIGH);
+
+              Serial.println("Arrosage demarrer");    
+            }else{
+              Serial.println("Impossible d'arroser car l'humidité est elever");    
+            }
+                  
           }
 
         else if(req.indexOf("/start/0") != -1){ // Bouton manuel_OFF
@@ -144,25 +152,25 @@ void traitement(){
     }
 
     if(pourcentage>20){
-      digitalWrite(led_rouge, 1);
+      digitalWrite(led_verte, 1);
       delay(500);
-      digitalWrite(led_rouge, 0);
+      digitalWrite(led_verte, 0);
       delay(500);    
-      digitalWrite(led_rouge, 1);
+      digitalWrite(led_verte, 1);
       delay(500);    
-      digitalWrite(led_rouge, 0);
+      digitalWrite(led_verte, 0);
       delay(500);    
-      digitalWrite(led_rouge, 1);
+      digitalWrite(led_verte, 1);
       delay(500);
-      digitalWrite(led_rouge, 0);
+      digitalWrite(led_verte, 0);
       delay(500); 
-      digitalWrite(led_rouge, 1);
+      digitalWrite(led_verte, 1);
       delay(500);    
-      digitalWrite(led_rouge, 0);
+      digitalWrite(led_verte, 0);
       delay(500);    
-      digitalWrite(led_rouge, 1);
+      digitalWrite(led_verte, 1);
       delay(500);
-      digitalWrite(led_rouge, 0);
+      digitalWrite(led_verte, 0);
       delay(500); 
     }
   
