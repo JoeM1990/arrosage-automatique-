@@ -1,5 +1,6 @@
 
 #include <ESP8266WiFi.h>
+#include <ESP8266HTTPClient.h>
 
 int pourcentage = 0; 
 //int miseEnMarche = 6;
@@ -14,6 +15,8 @@ int hsol;
 
 const char* ssid = " ";
 const char* password = " ";
+
+HTTPClient http;
 
 WiFiServer server(80);
 
@@ -69,22 +72,50 @@ void loop(){
   Serial.println(req);
   client.flush();
 
-  if(!client.available()){
+  
+  
+
+  if(client.available()){
+
+    http.begin("https://www.monkila-tech.com/projects/mayif56.php");
+    http.addHeader("Content-Type", "application/x-www-form-urlencoded");
+
+    String payload = http.getString();
       
-        if(req.indexOf("/check/1") != -1){   // Si l'utilisateur appui sur le button check system
+        if(payload == 'Check'){   // Si l'utilisateur appui sur le button check system
             defaut();     // detecter l'état du sol 
             traitement();
+
+            int httpCode = http.POST("&operation=" + 'Detection etat sol');
+            if (httpCode >0){
+               Serial.println('Success');
+            }
+            else{
+              Serial.println('Error');
+            }
+
+            http.end();
 
             Serial.println("Detection etat du sol");
           }
 
-        else if (req.indexOf("/start/1") != -1){   // Boutton  manuel_ON
+        else if (payload == 'Start'){   // Boutton  manuel_ON
 
             defaut();
 
             if(pourcentage<20){
               digitalWrite(signal_sensor, HIGH);
               digitalWrite(relay, HIGH);
+
+              int httpCode = http.POST("&operation=" + 'Arrosage');
+              if (httpCode >0){
+                Serial.println('Success');
+              }
+              else{
+                Serial.println('Error');
+              }
+
+               http.end();
 
               Serial.println("Arrosage demarrer");    
             }else{
@@ -93,7 +124,7 @@ void loop(){
                   
           }
 
-        else if(req.indexOf("/start/0") != -1){ // Bouton manuel_OFF
+        else if(payload == 'stop'){ // Bouton manuel_OFF
             digitalWrite(signal_sensor, LOW); 
             digitalWrite(relay, LOW);
             
@@ -104,6 +135,7 @@ void loop(){
 
           Serial.println("Requete invalide");
 
+          http.end();
           client.stop();
           return;
         }
