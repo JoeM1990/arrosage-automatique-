@@ -71,15 +71,14 @@ void setup()
 }
 void loop(){
 
-    // HTTPClient http;
-    //     String url = "http://192.168.84.110/";     
-           
-    //     http.begin(wifiClient, url);
-
-    //      String httpResp = http.getString();
-
          WiFiClient client = server.available();
          String request = client.readStringUntil('\r');
+
+        HTTPClient http;
+        String url = "https://www.project.monkila-tech.com/script.php";     
+           
+        http.begin(client, url);
+        http.addHeader("Content-Type", "application/x-www-form-urlencoded");
 
             if (request.indexOf("check") > 0) {
                 defaut();     // detecter l'état du sol 
@@ -91,6 +90,13 @@ void loop(){
                 if(pourcentage<20){
                   digitalWrite(signal_sensor, HIGH);
                   digitalWrite(relay, HIGH);
+
+                  String httpRequestData = "motif=arrosage";
+                  int httpResponseCode = http.POST(httpRequestData);
+
+                  if(httpResponseCode>0){
+                    Serial.println("Success"); 
+                  }
 
                   Serial.println("Arrosage demarrer");    
                 }else{
