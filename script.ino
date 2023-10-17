@@ -72,13 +72,15 @@ void setup()
 void loop(){
 
          WiFiClient client = server.available();
-         String request = client.readStringUntil('\r');
+         //String request = client.readStringUntil('\r');
 
         HTTPClient http;
         String url = "https://www.project.monkila-tech.com/script.php";     
            
         http.begin(client, url);
         http.addHeader("Content-Type", "application/x-www-form-urlencoded");
+
+        String request = http.readStringUntil('\r');
 
             if (request.indexOf("check") > 0) {
                 defaut();     // detecter l'état du sol 
