@@ -1,24 +1,54 @@
-
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
+#include <WiFiClient.h>
+
 
 int pourcentage = 0; 
 //int miseEnMarche = 6;
 
 int sensorPin = A0; 
 int led_verte = 13;
-int led_rouge = 13;
+int led_rouge = 12;
 int relay = 14;
 int signal_sensor =3;
 
 int hsol;
 
-const char* ssid = " ";
-const char* password = " ";
-
-HTTPClient http;
+const char* ssid = "Redmi10";
+const char* password = "mayif56jordan";
 
 WiFiServer server(80);
+WiFiClient wifiClient;
+
+String header = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n";
+String html_1 = "<!DOCTYPE html><html><head><meta name='viewport' content='width=device-width, initial-scale=1.0'/><meta charset='utf-8'><style>body {font-size:140%;} #main {display: table; margin: auto;  padding: 0 10px 0 10px; } h2,{text-align:center; } .button { padding:10px 10px 10px 10px; width:100%;  background-color: #4CAF50; font-size: 120%;}</style><title>Arrosage Control</title></head><body><div id='main'><h2>Arrosage Control</h2>";
+String html_2 = "";
+String html_4 = "</div></body></html>";
+
+void connectToWiFi() {
+    //Connect to WiFi Network
+      Serial.println();
+      Serial.println();
+      Serial.print("Connecting to WiFi");
+      Serial.println("...");
+      WiFi.begin(ssid, password);
+      int retries = 0;
+    while ((WiFi.status() != WL_CONNECTED) && (retries < 15)) {
+      retries++;
+      delay(500);
+      Serial.print(".");
+    }
+
+    server.begin();
+    Serial.println("Server started");
+
+    if (WiFi.status() == WL_CONNECTED) {
+        Serial.println(F("WiFi connected!"));
+        Serial.println("IP address: ");
+        Serial.println(WiFi.localIP());
+    }
+        Serial.println(F("Setup ready"));
+}
 
 void setup()
 {
@@ -36,111 +66,60 @@ void setup()
   digitalWrite(relay, LOW);
   //digitalWrite(miseEnMarche, HIGH);
 
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
-
-  Serial.println("");
-  Serial.println("WiFi OK");
+  connectToWiFi();
   
-  // demarrage du serveur
-  server.begin();
-  Serial.println("Server OK");
-
-  // Adresse IP locale attribuee
-  Serial.println(WiFi.localIP());
-
-
 }
 void loop(){
 
-  WiFiClient client = server.available();
+    // HTTPClient http;
+    //     String url = "http://192.168.84.110/";     
+           
+    //     http.begin(wifiClient, url);
 
-  if (!client) {
-    return;
-  }
+    //      String httpResp = http.getString();
 
-  // Attente donnees envoyees par un client
-  Serial.println("Nouveau client");
-  while(!client.available()){
-    delay(1);
-  }
+         WiFiClient client = server.available();
+         String request = client.readStringUntil('\r');
 
-  // Lecture premiere ligne de la requete
-  String req = client.readStringUntil('\r');
-  Serial.println(req);
-  client.flush();
+            if (request.indexOf("check") > 0) {
+                defaut();     // detecter l'état du sol 
+                traitement(); 
+            }
+            if ( request.indexOf("on") > 0) {
+                defaut();
+
+                if(pourcentage<20){
+                  digitalWrite(signal_sensor, HIGH);
+                  digitalWrite(relay, HIGH);
+
+                  Serial.println("Arrosage demarrer");    
+                }else{
+                  Serial.println("Impossible d'arroser car l'humidité est elever");   
+                  digitalWrite(relay, LOW); 
+                }   
+
+            }
+            if (request.indexOf("off") > 0) {
+                digitalWrite(signal_sensor, LOW); 
+                digitalWrite(relay, LOW);
+                
+                Serial.println("Arrosage fermer");
+
+               
+            }
+
+          
+            // client.flush();
+ 
+            // client.print( header );
+            // client.print( html_1 );    
+            // client.print( html_2 );
+            // client.print( html_4);
+        
+            // delay(5);
+
 
   
-  
-
-  if(client.available()){
-
-    http.begin("https://www.monkila-tech.com/projects/mayif56.php");
-    http.addHeader("Content-Type", "application/x-www-form-urlencoded");
-
-    String payload = http.getString();
-      
-        if(payload == 'Check'){   // Si l'utilisateur appui sur le button check system
-            defaut();     // detecter l'état du sol 
-            traitement();
-
-            int httpCode = http.POST("&operation=" + 'Detection etat sol');
-            if (httpCode >0){
-               Serial.println('Success');
-            }
-            else{
-              Serial.println('Error');
-            }
-
-            http.end();
-
-            Serial.println("Detection etat du sol");
-          }
-
-        else if (payload == 'Start'){   // Boutton  manuel_ON
-
-            defaut();
-
-            if(pourcentage<20){
-              digitalWrite(signal_sensor, HIGH);
-              digitalWrite(relay, HIGH);
-
-              int httpCode = http.POST("&operation=" + 'Arrosage');
-              if (httpCode >0){
-                Serial.println('Success');
-              }
-              else{
-                Serial.println('Error');
-              }
-
-               http.end();
-
-              Serial.println("Arrosage demarrer");    
-            }else{
-              Serial.println("Impossible d'arroser car l'humidité est elever");    
-            }
-                  
-          }
-
-        else if(payload == 'stop'){ // Bouton manuel_OFF
-            digitalWrite(signal_sensor, LOW); 
-            digitalWrite(relay, LOW);
-            
-            Serial.println("Arrosage fermer");
-        }
-
-        else{
-
-          Serial.println("Requete invalide");
-
-          http.end();
-          client.stop();
-          return;
-        }
- } 
-
 }
 
 
@@ -154,7 +133,9 @@ int Conversion(int value){
 
 void defaut(){
       hsol = analogRead(sensorPin);
-      pourcentage = Conversion(hsol);        
+      pourcentage = Conversion(hsol);   
+           
+           Serial.println(pourcentage);
   }  
 
 
@@ -207,4 +188,3 @@ void traitement(){
     }
   
   }
-  
