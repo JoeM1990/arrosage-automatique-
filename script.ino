@@ -93,7 +93,9 @@ void loop(){
                   digitalWrite(signal_sensor, HIGH);
                   digitalWrite(relay, HIGH);
 
-                  String httpRequestData = "motif=arrosage";
+                  double qt = 0,06*5;
+
+                  String httpRequestData = "motif=arrosage&quantite="+qt;
                   int httpResponseCode = http.POST(httpRequestData);
 
                   if(httpResponseCode>0){
