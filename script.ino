@@ -26,6 +26,14 @@ String html_2 = "";
 String html_4 = "</div></body></html>";
 
 void connectToWiFi() {
+
+    IPAddress ip(192, 168, 1, 99);
+    IPAddress dns(192,168,1,254);
+    IPAddress gateway(192,168,1,254);
+    IPAddress subnet(255, 255, 255, 0);
+
+    WiFi.config(ip, dns, gateway, subnet);
+    
     //Connect to WiFi Network
       Serial.println();
       Serial.println();
@@ -38,6 +46,8 @@ void connectToWiFi() {
       delay(500);
       Serial.print(".");
     }
+
+   
 
     server.begin();
     Serial.println("Server started");
@@ -72,15 +82,15 @@ void setup()
 void loop(){
 
          WiFiClient client = server.available();
-         //String request = client.readStringUntil('\r');
+         String request = client.readStringUntil('\r');
 
-        HTTPClient http;
+        HTTPClient https;
         String url = "https://www.project.monkila-tech.com/script.php";     
            
-        http.begin(client, url);
-        http.addHeader("Content-Type", "application/x-www-form-urlencoded");
+        https.begin(client, url);
+        https.addHeader("Content-Type", "application/x-www-form-urlencoded");
 
-        String request = http.readStringUntil('\r');
+        //String request = http.readStringUntil('\r');
 
             if (request.indexOf("check") > 0) {
                 defaut();     // detecter l'état du sol 
@@ -93,14 +103,22 @@ void loop(){
                   digitalWrite(signal_sensor, HIGH);
                   digitalWrite(relay, HIGH);
 
+                  HTTPClient https;
+                  String url = "https://www.project.monkila-tech.com/script.php";     
+                    
+                  http.begin(client, url);
+                  http.addHeader("Content-Type", "application/x-www-form-urlencoded");
+
                   double qt = 0,06*5;
 
                   String httpRequestData = "motif=arrosage&quantite="+qt;
-                  int httpResponseCode = http.POST(httpRequestData);
+                  int httpResponseCode = https.POST(httpRequestData);
 
                   if(httpResponseCode>0){
                     Serial.println("Success"); 
                   }
+
+                  https.end();
 
                   Serial.println("Arrosage demarrer");    
                 }else{
