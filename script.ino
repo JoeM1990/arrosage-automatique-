@@ -28,11 +28,11 @@ String html_4 = "</div></body></html>";
 void connectToWiFi() {
 
     IPAddress ip(192, 168, 56, 110);
-    IPAddress dns(192,168,1,254);
-    IPAddress gateway(192,168,1,254);
+    IPAddress dns(192,168,56,110);
+    IPAddress gateway(192,168,56,254);
     IPAddress subnet(255, 255, 255, 0);
 
-    WiFi.config(ip);
+    WiFi.config(ip, dns, gateway, subnet);
 
     //Connect to WiFi Network
       Serial.println();
