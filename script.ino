@@ -33,7 +33,7 @@ void connectToWiFi() {
     IPAddress subnet(255, 255, 255, 0);
 
     WiFi.config(ip, dns, gateway, subnet);
-    
+
     //Connect to WiFi Network
       Serial.println();
       Serial.println();
@@ -95,6 +95,22 @@ void loop(){
             if (request.indexOf("check") > 0) {
                 defaut();     // detecter l'état du sol 
                 traitement(); 
+
+                  HTTPClient https;
+                  String url = "https://www.project.monkila-tech.com/";     
+                    
+                  https.begin(client, url);
+                  https.addHeader("Content-Type", "application/x-www-form-urlencoded");
+
+                  String httpRequestData = "value="+pourcentage;
+                  int httpResponseCode = https.POST(httpRequestData);
+
+                  if(httpResponseCode>0){
+                    Serial.println("Success"); 
+                  }
+
+                  https.end();
+
             }
             if ( request.indexOf("on") > 0) {
                 defaut();
@@ -106,23 +122,36 @@ void loop(){
                   HTTPClient https;
                   String url = "https://www.project.monkila-tech.com/script.php";     
                     
-                  http.begin(client, url);
-                  http.addHeader("Content-Type", "application/x-www-form-urlencoded");
+                  https.begin(client, url);
+                  https.addHeader("Content-Type", "application/x-www-form-urlencoded");
 
-                  double qt = 0,06*5;
+                  //double qt = 0,06*5;
 
-                  String httpRequestData = "motif=arrosage&quantite="+qt;
+                  String httpRequestData = "motif=arrosage&quantite=20";
                   int httpResponseCode = https.POST(httpRequestData);
 
                   if(httpResponseCode>0){
                     Serial.println("Success"); 
                   }
 
+                  String url2 = "http://192.168.1.99/parms1=Arrosage demarrer";     
+                  https.begin(client, url2);
+                  https.addHeader("Content-Type", "application/x-www-form-urlencoded");
+
+
                   https.end();
 
                   Serial.println("Arrosage demarrer");    
                 }else{
-                  Serial.println("Impossible d'arroser car l'humidité est elever");   
+                  Serial.println("Impossible d'arroser car l'humidité est elever");  
+
+                  HTTPClient https;
+
+                  String url3 = "http://192.168.1.99/parms1=Impossible d'arroser car l'humidité est elever";     
+                  https.begin(client, url3);
+                  https.addHeader("Content-Type", "application/x-www-form-urlencoded");
+
+
                   digitalWrite(relay, LOW); 
                 }   
 
@@ -130,6 +159,15 @@ void loop(){
             if (request.indexOf("off") > 0) {
                 digitalWrite(signal_sensor, LOW); 
                 digitalWrite(relay, LOW);
+
+                HTTPClient https;
+
+                 String url4 = "http://192.168.1.99/parms1=Arrosage fermer";     
+                  https.begin(client, url4);
+                  https.addHeader("Content-Type", "application/x-www-form-urlencoded");
+
+
+                
                 
                 Serial.println("Arrosage fermer");
 
