@@ -27,12 +27,12 @@ String html_4 = "</div></body></html>";
 
 void connectToWiFi() {
 
-    IPAddress ip(192, 168, 1, 99);
+    IPAddress ip(192, 168, 56, 110);
     IPAddress dns(192,168,1,254);
     IPAddress gateway(192,168,1,254);
     IPAddress subnet(255, 255, 255, 0);
 
-    WiFi.config(ip, dns, gateway, subnet);
+    WiFi.config(ip);
 
     //Connect to WiFi Network
       Serial.println();
@@ -134,7 +134,7 @@ void loop(){
                     Serial.println("Success"); 
                   }
 
-                  String url2 = "http://192.168.1.99/parms1=Arrosage demarrer";     
+                  String url2 = "http://192.168.56.110/parms1=Arrosage demarrer";     
                   https.begin(client, url2);
                   https.addHeader("Content-Type", "application/x-www-form-urlencoded");
 
@@ -147,7 +147,7 @@ void loop(){
 
                   HTTPClient https;
 
-                  String url3 = "http://192.168.1.99/parms1=Impossible d'arroser car l'humidité est elever";     
+                  String url3 = "http://192.168.56.110/parms1=Impossible d'arroser car l'humidité est elever";     
                   https.begin(client, url3);
                   https.addHeader("Content-Type", "application/x-www-form-urlencoded");
 
@@ -162,12 +162,9 @@ void loop(){
 
                 HTTPClient https;
 
-                 String url4 = "http://192.168.1.99/parms1=Arrosage fermer";     
+                 String url4 = "http://192.168.56.110/parms1=Arrosage fermer";     
                   https.begin(client, url4);
                   https.addHeader("Content-Type", "application/x-www-form-urlencoded");
-
-
-                
                 
                 Serial.println("Arrosage fermer");
 
