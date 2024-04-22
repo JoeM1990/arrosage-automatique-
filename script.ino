@@ -14,8 +14,8 @@ int signal_sensor =3;
 
 int hsol;
 
-const char* ssid = "Redmi10";
-const char* password = "mayif56jordan";
+const char* ssid = "";
+const char* password = "";
 
 WiFiServer server(80);
 WiFiClient wifiClient;
