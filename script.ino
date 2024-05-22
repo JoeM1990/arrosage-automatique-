@@ -85,7 +85,7 @@ void loop(){
          String request = client.readStringUntil('\r');
 
         HTTPClient https;
-        String url = "https://www.project.monkila-tech.com/script.php";     
+        String url = "https://www.project.monkila-tech.com/";     
            
         https.begin(client, url);
         https.addHeader("Content-Type", "application/x-www-form-urlencoded");
